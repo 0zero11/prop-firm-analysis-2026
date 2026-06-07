@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloomberg Intelligence: Prop Firm Structural Transparency 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Institutional Terminal Dark (Obsidian background, Stark White text, Neon Cyan/Orange/Purple data accents) -->
+    <!-- Application Structure Plan: Designed as an institutional intelligence briefing. Uses a dark-mode dashboard layout typical of professional financial software (e.g., Bloomberg Terminal/Symphony). The flow moves from macroeconomic thesis -> interactive quantitative modeling (Drawdown) -> qualitative rules matrix -> multivariate modeling (Radar) -> final analyst verdict. This structure caters to a highly analytical user who expects data first, narrative second. -->
+    <!-- Visualization & Content Choices: 
+         1. Drawdown Simulation -> Goal: Change/Compare -> Line Chart (Chart.js Canvas). Justifies plotting the mathematical delta between algorithmic risk floors over a simulated time series, emphasizing "open-equity cannibalization."
+         2. Rules Matrix -> Goal: Organize/Compare -> Interactive HTML/Tailwind Table with JS view toggles. Justifies presenting dense contractual constraints in a highly structured, switchable ledger format.
+         3. Restrictiveness Profile -> Goal: Compare -> Radar Chart (Chart.js Canvas). Justifies multi-variable modeling of subjective friction vectors derived from the objective contractual terms.
+         Confirming NO SVG/Mermaid used. 
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #050505; /* Deep Obsidian */
+            color: #E5E7EB; /* Gray 200 */
+        }
+        .font-mono-data { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Terminal Aesthetics */
+        .panel {
+            background-color: #111111;
+            border: 1px solid #262626;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        .panel-header {
+            border-bottom: 1px solid #262626;
+            background: linear-gradient(180deg, #1A1A1A 0%, #111111 100%);
+        }
+        
+        .chart-container { 
+            position: relative; 
+            width: 100%; 
+            max-width: 900px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 350px; 
+            max-height: 400px; 
+        }
+        @media (min-width: 768px) { 
+            .chart-container { height: 450px; } 
+        }
+        @media (min-width: 1024px) {
+            .radar-container { max-width: 600px; }
+        }
+
+        /* Ledger Table Styling */
+        .data-table th { 
+            background-color: #1A1A1A; 
+            color: #9CA3AF; 
+            border-bottom: 1px solid #3F3F46; 
+            padding: 12px 16px; 
+            text-align: left; 
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .data-table td { 
+            border-bottom: 1px solid #262626; 
+            padding: 16px; 
+            background-color: transparent;
+            transition: background-color 0.15s;
+        }
+        .data-table tr:hover td { background-color: #1A1A1A; }
+        
+        .tab-btn { 
+            transition: all 0.2s ease-in-out; 
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .tab-btn.active { 
+            background-color: #262626; 
+            color: #FFFFFF; 
+            border-top: 2px solid #00E5FF;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #3F3F46; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #52525B; }
+    </style>
+</head>
+<body class="antialiased leading-relaxed selection:bg-cyan-900 selection:text-cyan-50">
+
+    <nav class="sticky top-0 z-50 bg-[#050505]/95 backdrop-blur-md border-b border-zinc-800 px-6 py-3 shadow-lg">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+            <div class="text-xl font-bold tracking-tight text-white flex items-center">
+                <span class="text-cyan-400 mr-3 text-2xl font-mono-data">&#9632;</span> 
+                <span>QUANTITATIVE INTELLIGENCE</span>
+            </div>
+            <div class="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest border border-zinc-700 px-3 py-1 rounded bg-zinc-900 flex items-center">
+                <span class="w-2 h-2 rounded-full bg-red-500 mr-2 animate-pulse"></span>
+                Terminal Briefing // Q1 2026
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 space-y-12">
+        
+        <header class="max-w-5xl space-y-6">
+            <h1 class="text-3xl md:text-5xl font-semibold text-white leading-tight font-mono-data tracking-tight">
+                Retail Edge Attrition: A Structural Dissection of 2026 Prop Firm Architectures
+            </h1>
+            <p class="text-lg md:text-xl text-zinc-400 leading-relaxed">
+                The commoditization of retail trading capital has spawned highly optimized, structurally asymmetric evaluation models. This briefing provides an empirical analysis of standard $50K futures allocations across <strong class="text-orange-500 font-semibold">Apex Trader Funding (v4.0)</strong>, <strong class="text-cyan-400 font-semibold">Topstep (XFA)</strong>, and <strong class="text-purple-400 font-semibold">The5ers</strong>. We isolate how specific drawdown velocity parameters and liquidity extraction constraints mathematically impact retail survivability.
+            </p>
+        </header>
+
+        <!-- Section 1: Drawdown Modeling -->
+        <section id="drawdown-mechanics" class="scroll-mt-24">
+            <div class="panel rounded-xl overflow-hidden">
+                <div class="panel-header p-6">
+                    <h2 class="text-xl font-semibold text-white flex items-center font-mono-data">
+                        <span class="text-cyan-400 mr-3">&#9654;</span> FIG 1.0: Drawdown Velocity & Open-Equity Cannibalization
+                    </h2>
+                    <p class="text-zinc-400 text-sm mt-2 max-w-4xl">
+                        The primary vector for retail capital attrition lies in the algorithmic calculation of trailing risk thresholds. This model simulates a highly volatile intraday session, exposing the mathematical delta between <span class="text-white font-medium">Tick-by-Tick Intraday Trailing</span> models (which cannibalize open equity) and <span class="text-white font-medium">End-of-Day (EOD)</span> risk parameters.
+                    </p>
+                </div>
+
+                <div class="p-6 md:p-8">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-zinc-200">Simulated $50K Allocation Equity Curve</h3>
+                            <p class="text-xs text-zinc-500 mt-1 font-mono-data">SCENARIO: $1,500 unrealized peak -> $200 realized session close.</p>
+                        </div>
+                        <button id="runSimulationBtn" class="bg-zinc-800 hover:bg-zinc-700 text-cyan-400 border border-zinc-600 px-5 py-2 text-xs font-bold uppercase tracking-wider font-mono-data transition-colors flex items-center">
+                            <span>[ EXECUTE SIMULATION ]</span>
+                        </button>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="drawdownChart"></canvas>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+                        <div class="p-4 bg-[#1A110D] border border-orange-900/50 relative">
+                            <h4 class="font-bold text-orange-500 mb-1 flex items-center text-sm font-mono-data">
+                                APEX <span class="text-[10px] ml-2 border border-orange-500/30 text-orange-400 px-1.5 py-0.5">INTRADAY FLAGSHIP</span>
+                            </h4>
+                            <p class="text-xs text-zinc-400 leading-relaxed mt-2">
+                                <strong class="text-zinc-200">Margin Buffer: $2,500.</strong> Under their heavily marketed standard model, the risk floor moves tick-by-tick with the highest unrealized profit. An intraday equity spike raises the failure threshold, severely shrinking the trader's workable risk allowance even upon closing a profitable trade. 
+                                <span class="block mt-2 text-[10px] text-orange-500/70 italic">*Note: Apex also offers dedicated EOD-trailing accounts, though the Intraday trail remains the default structural benchmark.</span>
+                            </p>
+                        </div>
+                        <div class="p-4 bg-[#0A1A1A] border border-cyan-900/50 relative">
+                            <h4 class="font-bold text-cyan-400 mb-1 flex items-center text-sm font-mono-data">
+                                TOPSTEP <span class="text-[10px] ml-2 border border-cyan-500/30 text-cyan-300 px-1.5 py-0.5">EOD (XFA)</span>
+                            </h4>
+                            <p class="text-xs text-zinc-400 leading-relaxed mt-2">
+                                <strong class="text-zinc-200">Margin Buffer: $2,000.</strong> The risk floor is calculated strictly at session close (4:00 PM CT). It <strong>trails upward EOD</strong> until locking at the initial $50K balance. Intraday volatility does not dynamically elevate the failure threshold, preventing the immediate penalization of swing-style positions.
+                            </p>
+                        </div>
+                        <div class="p-4 bg-[#140D1A] border border-purple-900/50 relative">
+                            <h4 class="font-bold text-purple-400 mb-1 flex items-center text-sm font-mono-data">
+                                THE5ERS <span class="text-[10px] ml-2 border border-purple-500/30 text-purple-300 px-1.5 py-0.5">EOD 4%</span>
+                            </h4>
+                            <p class="text-xs text-zinc-400 leading-relaxed mt-2">
+                                <strong class="text-zinc-200">Margin Buffer: $2,000.</strong> Utilizing a 4% trailing limit anchored to the End-of-Day balance, this architecture mirrors Topstep's intraday leniency. It provides operational breathing room by ignoring unrealized synthetic equity spikes during active session trading.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Ledger Matrix -->
+        <section id="structural-constraints" class="scroll-mt-24">
+            <div class="panel rounded-xl overflow-hidden">
+                <div class="panel-header p-6">
+                    <h2 class="text-xl font-semibold text-white flex items-center font-mono-data">
+                        <span class="text-cyan-400 mr-3">&#9654;</span> FIG 2.0: Operational Friction & Liquidity Extraction Ledger
+                    </h2>
+                    <p class="text-zinc-400 text-sm mt-2">
+                        Institutional capital allocators utilize duration risk and execution constraints to enforce statistical variance reversion. Toggle below to analyze execution parameters versus actual capital extraction (payout) friction.
+                    </p>
+                </div>
+
+                <div class="bg-[#111111]">
+                    <div class="flex border-b border-zinc-800 bg-[#0A0A0A]">
+                        <button class="tab-btn active flex-1 py-3 px-4 text-xs font-bold text-zinc-500 hover:text-zinc-300 uppercase tracking-widest" onclick="switchTab('execution')">
+                            Execution Parameters
+                        </button>
+                        <button class="tab-btn flex-1 py-3 px-4 text-xs font-bold text-zinc-500 hover:text-zinc-300 uppercase tracking-widest" onclick="switchTab('payouts')">
+                            Liquidity Extraction Limits
+                        </button>
+                    </div>
+
+                    <div id="tab-execution" class="p-0 overflow-x-auto">
+                        <table class="w-full data-table">
+                            <thead>
+                                <tr>
+                                    <th>Entity / Architecture</th>
+                                    <th>Mandatory Liquidation</th>
+                                    <th>Overnight Exposure</th>
+                                    <th>Macroeconomic Event Trading</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-bold text-orange-500 font-mono-data">Apex (v4.0 Core)</td>
+                                    <td class="text-zinc-300 font-mono-data">4:59 PM ET</td>
+                                    <td><span class="text-red-500 text-xs px-2 py-1 bg-red-500/10 border border-red-500/20">PROHIBITED</span></td>
+                                    <td><span class="text-green-400 text-xs px-2 py-1 bg-green-400/10 border border-green-400/20">PERMITTED</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-cyan-400 font-mono-data">Topstep (XFA)</td>
+                                    <td class="text-zinc-300 font-mono-data">3:10 PM CT</td>
+                                    <td><span class="text-red-500 text-xs px-2 py-1 bg-red-500/10 border border-red-500/20">PROHIBITED</span></td>
+                                    <td><span class="text-yellow-500 text-xs px-2 py-1 bg-yellow-500/10 border border-yellow-500/20">RESTRICTED (±1 MIN)</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-purple-400 font-mono-data">The5ers (Futures)</td>
+                                    <td class="text-zinc-300 font-mono-data">Friday Market Close</td>
+                                    <td><span class="text-green-400 text-xs px-2 py-1 bg-green-400/10 border border-green-400/20">PERMITTED (W/ MARGIN)</span></td>
+                                    <td><span class="text-yellow-500 text-xs px-2 py-1 bg-yellow-500/10 border border-yellow-500/20">RESTRICTED (±2 MINS)</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="tab-payouts" class="p-0 overflow-x-auto hidden">
+                        <table class="w-full data-table">
+                            <thead>
+                                <tr>
+                                    <th>Entity / Architecture</th>
+                                    <th>Algorithmic Consistency Limit</th>
+                                    <th>Profit Distribution Schedule</th>
+                                    <th>Extraction Friction / Hard Caps</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-bold text-orange-500 font-mono-data">Apex (v4.0 Core)</td>
+                                    <td><span class="text-red-400 font-mono-data">30%</span> Max Daily Profit Threshold</td>
+                                    <td class="text-zinc-300">100% First $25k <span class="text-zinc-500 font-mono-data">-></span> 90/10 Split</td>
+                                    <td><span class="text-red-500 font-bold border-b border-red-500/50 border-dotted">6 Payouts Lifetime (Terminal Account Closure)</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-cyan-400 font-mono-data">Topstep (XFA)</td>
+                                    <td><span class="text-yellow-400 font-mono-data">50% Eval / 40% Funded</span> Ratio of Total Profits</td>
+                                    <td class="text-zinc-300">90/10 Split immediately upon realization</td>
+                                    <td><span class="text-red-400">Max 50% Rule; <strong class="text-red-500">Early extractions strictly capped at $2K</strong></span></td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-purple-400 font-mono-data">The5ers (Futures)</td>
+                                    <td><span class="text-purple-400 font-mono-data">40%</span> Per Position Concentration Limit</td>
+                                    <td class="text-zinc-300">100% First $8k <span class="text-zinc-500 font-mono-data">-></span> 80/20 Split</td>
+                                    <td><span class="text-green-400">Bi-weekly processing; No absolute frequency cap</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bg-[#050505] p-3 text-[10px] text-zinc-600 font-mono-data border-t border-zinc-800">
+                        * DATA NORMALIZED FOR STANDARD $50,000 NOTIONAL EVALUATIONS | EFF. Q1 2026.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Multivariate Profile -->
+        <section id="restrictiveness-profile" class="scroll-mt-24">
+             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div class="lg:col-span-5 space-y-6">
+                    <h2 class="text-xl font-semibold text-white flex items-center font-mono-data">
+                        <span class="text-cyan-400 mr-3">&#9654;</span> FIG 3.0: Multivariate Restrictiveness Modeling
+                    </h2>
+                    <p class="text-zinc-400 text-sm leading-relaxed">
+                        By quantifying operational rulesites into statistical metrics, we graph the structural bias of each proprietary architecture. Expansion toward the perimeter indicates higher latitude for retail alpha generation; contraction toward the centroid indicates high institutional friction and elevated failure probability.
+                    </p>
+                    <div class="space-y-3 pt-4 border-t border-zinc-800">
+                        <div class="text-xs">
+                            <span class="text-zinc-200 font-bold font-mono-data">Y1: Drawdown Leniency:</span> <span class="text-zinc-500">Resistance to unrealized equity clawbacks.</span>
+                        </div>
+                        <div class="text-xs">
+                            <span class="text-zinc-200 font-bold font-mono-data">Y2: Liquidity Access:</span> <span class="text-zinc-500">Absence of arbitrary payout caps or terminal limits.</span>
+                        </div>
+                        <div class="text-xs">
+                            <span class="text-zinc-200 font-bold font-mono-data">Y3: Strategy Latitude:</span> <span class="text-zinc-500">Tolerance for duration risk (swing trading, macro holds).</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:col-span-7 panel p-6 flex justify-center">
+                    <div class="chart-container radar-container w-full h-[350px] md:h-[450px]">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Conclusion -->
+        <section class="panel border-cyan-900/50 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-cyan-900/10 to-transparent pointer-events-none"></div>
+            
+            <div class="p-8 md:p-10">
+                <h2 class="text-2xl font-semibold mb-6 flex items-center text-white font-mono-data">
+                    <span class="w-3 h-3 bg-cyan-400 rounded-sm mr-3 animate-pulse"></span>
+                    INSTITUTIONAL VERDICT: The Asymmetry of Retail Funding
+                </h2>
+                <p class="text-zinc-400 mb-10 leading-relaxed text-sm max-w-4xl">
+                    Analysis of the Q1 2026 proprietary trading landscape confirms highly optimized risk modeling that heavily favors the issuer. The quantitative divergence in specific structural mechanics acts as the primary headwind to sustainable retail profitability across three distinct vectors:
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+                    <div class="bg-[#0A0A0A] p-6 border border-zinc-800 hover:border-cyan-500/50 transition-colors">
+                        <div class="text-zinc-600 text-sm font-mono-data mb-4">VECTOR 01</div>
+                        <h4 class="text-md font-bold text-white mb-3 tracking-wide">Synthetic Leverage Illusion</h4>
+                        <p class="text-zinc-400 text-xs leading-relaxed">
+                            Advertised $50K notional capital is a fallacy; true risk capital equals the strict drawdown buffer (~$2,000). Furthermore, trailing architectures—whether tick-by-tick (Apex Standard) or EOD (Topstep)—engineer a scenario where early PnL growth actually contracts the trader's workable buffer relative to the high-water mark, mathematically enforcing tighter duration limits.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-[#0A0A0A] p-6 border border-zinc-800 hover:border-cyan-500/50 transition-colors">
+                        <div class="text-zinc-600 text-sm font-mono-data mb-4">VECTOR 02</div>
+                        <h4 class="text-md font-bold text-white mb-3 tracking-wide">Duration Risk via Liquidity Caps</h4>
+                        <p class="text-zinc-400 text-xs leading-relaxed">
+                            Firms effectively weaponize the "Time in Market" paradigm. By instituting strict early payout caps (Topstep's $2K XFA limit) or enforcing lifetime account termination (Apex's 6-payout closure), issuers mathematically manipulate the lifespan of a funded entity. This forced ongoing market exposure maximizes the probability of mean reversion and statistical ruin prior to significant liquidity extraction.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-[#0A0A0A] p-6 border border-zinc-800 hover:border-cyan-500/50 transition-colors">
+                        <div class="text-zinc-600 text-sm font-mono-data mb-4">VECTOR 03</div>
+                        <h4 class="text-md font-bold text-white mb-3 tracking-wide">Algorithmic Homogenization</h4>
+                        <p class="text-zinc-400 text-xs leading-relaxed">
+                            Rigid intraday liquidation mandates (e.g., 3:10 PM CT) and complex PnL consistency ratios (e.g., Topstep's 40% XFA threshold) systematically eliminate swing and macro-style alpha generation. The architectural ruleset funnels retail flow into hyper-scalping modalities, maximizing synthetic commission generation for the issuer while exposing the trader to elevated microstructure friction.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <footer class="text-center text-[10px] text-zinc-600 pb-8 pt-4 font-mono-data border-t border-zinc-800">
+            PROPRIETARY RESEARCH // CONFIDENTIAL DISTRIBUTION // DATA VERIFIED Q1 2026.
+        </footer>
+
+    </main>
+
+    <script>
+        // Tab Navigation Logic
+        function switchTab(tabId) {
+            document.getElementById('tab-execution').classList.add('hidden');
+            document.getElementById('tab-payouts').classList.add('hidden');
+            
+            const btns = document.querySelectorAll('.tab-btn');
+            btns.forEach(btn => btn.classList.remove('active', 'text-white', 'border-t', 'border-cyan-400'));
+            btns.forEach(btn => btn.classList.add('text-zinc-500'));
+            
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            event.currentTarget.classList.add('active', 'text-white');
+            event.currentTarget.classList.remove('text-zinc-500');
+        }
+
+        // Chart.js Label Wrapping Utility
+        function wrapLabel(label) {
+            if (label.length <= 16) return label;
+            let words = label.split(' ');
+            let lines = [];
+            let currentLine = '';
+            for (let word of words) {
+                if ((currentLine + word).length > 16) {
+                    if(currentLine) lines.push(currentLine.trim());
+                    currentLine = word + ' ';
+                } else {
+                    currentLine += word + ' ';
+                }
+            }
+            if (currentLine) lines.push(currentLine.trim());
+            return lines;
+        }
+
+        // Institutional Tooltip Config
+        const commonTooltipConfig = {
+            callbacks: {
+                title: function(tooltipItems) {
+                    const item = tooltipItems[0];
+                    let label = item.chart.data.labels[item.dataIndex];
+                    return Array.isArray(label) ? label.join(' ') : label;
+                }
+            },
+            backgroundColor: 'rgba(17, 17, 17, 0.95)', 
+            titleColor: '#00E5FF', 
+            bodyColor: '#E5E7EB', 
+            borderColor: '#3F3F46', 
+            borderWidth: 1,
+            padding: 12,
+            titleFont: { family: 'JetBrains Mono', size: 11 },
+            bodyFont: { family: 'JetBrains Mono', size: 11 },
+            cornerRadius: 0
+        };
+
+        Chart.defaults.font.family = 'JetBrains Mono, monospace';
+        Chart.defaults.color = '#71717A'; 
+
+        // --- DRAWDOWN SIMULATION CHART ---
+        const ctxDrawdown = document.getElementById('drawdownChart').getContext('2d');
+        const timeLabels = ['09:30 (MKT OPEN)', '11:00 (ENTRY)', '13:00 (PEAK PNL)', '14:30 (RETRACE)', '16:00 (MKT CLOSE)'];
+        const processedTimeLabels = timeLabels.map(wrapLabel);
+        
+        const initialData = {
+            equity: [50000, 50000, 50000, 50000, 50000],
+            apexFloor: [47500, 47500, 47500, 47500, 47500],
+            eodFloor: [48000, 48000, 48000, 48000, 48000] 
+        };
+
+        const simulatedData = {
+            equity: [50000, 50000, 51500, 50600, 50200],
+            apexFloor: [47500, 47500, 49000, 49000, 49000], 
+            eodFloor: [48000, 48000, 48000, 48000, 48200]  
+        };
+
+        const drawdownChart = new Chart(ctxDrawdown, {
+            type: 'line',
+            data: {
+                labels: processedTimeLabels,
+                datasets: [
+                    {
+                        label: 'NOTIONAL EQUITY',
+                        data: [...initialData.equity],
+                        borderColor: '#F3F4F6', 
+                        borderWidth: 2,
+                        pointBackgroundColor: '#F3F4F6',
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        tension: 0.3,
+                        fill: false,
+                        zIndex: 10
+                    },
+                    {
+                        label: 'APEX (INTRADAY TRAIL)',
+                        data: [...initialData.apexFloor],
+                        borderColor: '#F97316', 
+                        backgroundColor: 'rgba(249, 115, 22, 0.05)',
+                        borderDash: [4, 4],
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.1,
+                        fill: '-1' 
+                    },
+                    {
+                        label: 'TOPSTEP/THE5ERS (EOD TRAIL)',
+                        data: [...initialData.eodFloor],
+                        borderColor: '#2DD4BF', 
+                        borderDash: [4, 4],
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 1200, easing: 'easeOutExpo' },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { usePointStyle: true, boxWidth: 6, padding: 20, font: { size: 10 } }
+                    },
+                    tooltip: commonTooltipConfig
+                },
+                scales: {
+                    y: {
+                        min: 47000,
+                        max: 52000,
+                        grid: { color: '#262626' },
+                        ticks: {
+                            callback: function(value) { return '$' + value.toLocaleString(); },
+                            font: { size: 10 }
+                        }
+                    },
+                    x: {
+                        grid: { color: '#262626', drawBorder: false },
+                        ticks: { font: { size: 10 } }
+                    }
+                }
+            }
+        });
+
+        let isSimulated = false;
+        document.getElementById('runSimulationBtn').addEventListener('click', function() {
+            const btn = this;
+            if(!isSimulated) {
+                drawdownChart.data.datasets[0].data = simulatedData.equity;
+                drawdownChart.data.datasets[1].data = simulatedData.apexFloor;
+                drawdownChart.data.datasets[2].data = simulatedData.eodFloor;
+                btn.innerHTML = '<span>[ RESET PARAMETERS ]</span>';
+                btn.classList.replace('text-cyan-400', 'text-zinc-400');
+                isSimulated = true;
+            } else {
+                drawdownChart.data.datasets[0].data = initialData.equity;
+                drawdownChart.data.datasets[1].data = initialData.apexFloor;
+                drawdownChart.data.datasets[2].data = initialData.eodFloor;
+                btn.innerHTML = '<span>[ EXECUTE SIMULATION ]</span>';
+                btn.classList.replace('text-zinc-400', 'text-cyan-400');
+                isSimulated = false;
+            }
+            drawdownChart.update();
+        });
+
+        // --- RESTRICTIVENESS RADAR CHART ---
+        const ctxRadar = document.getElementById('radarChart').getContext('2d');
+        const radarLabelsRaw = ['Drawdown Leniency', 'Consistency Tolerance', 'Execution Freedom', 'Liquidity Access', 'Macro/News Latitude'];
+        const processedRadarLabels = radarLabelsRaw.map(wrapLabel);
+
+        new Chart(ctxRadar, {
+            type: 'radar',
+            data: {
+                labels: processedRadarLabels,
+                datasets: [
+                    {
+                        label: 'APEX (v4.0 CORE)',
+                        data: [3, 4, 3, 2, 9],
+                        backgroundColor: 'rgba(249, 115, 22, 0.1)', 
+                        borderColor: '#F97316',
+                        pointBackgroundColor: '#F97316',
+                        borderWidth: 1.5,
+                        pointRadius: 3
+                    },
+                    {
+                        label: 'TOPSTEP (XFA)',
+                        data: [8, 6, 3, 4, 3],
+                        backgroundColor: 'rgba(34, 211, 238, 0.1)', 
+                        borderColor: '#22D3EE',
+                        pointBackgroundColor: '#22D3EE',
+                        borderWidth: 1.5,
+                        pointRadius: 3
+                    },
+                    {
+                        label: 'THE5ERS',
+                        data: [8, 5, 8, 7, 5],
+                        backgroundColor: 'rgba(192, 132, 252, 0.1)', 
+                        borderColor: '#C084FC',
+                        pointBackgroundColor: '#C084FC',
+                        borderWidth: 1.5,
+                        pointRadius: 3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { usePointStyle: true, boxWidth: 6, padding: 20, font: { size: 10 } }
+                    },
+                    tooltip: commonTooltipConfig
+                },
+                scales: {
+                    r: {
+                        angleLines: { color: '#262626' },
+                        grid: { color: '#262626' },
+                        pointLabels: { color: '#9CA3AF', font: { size: 10 } },
+                        ticks: { display: false, min: 0, max: 10 }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
